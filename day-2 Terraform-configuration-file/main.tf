@@ -1,21 +1,27 @@
-resource "aws_vpc" "name" {
-    cidr_block = "10.0.0.0/16"
-    tags = {
-      Name = "Day-2"
-    }
+resource "aws_vpc" "Dev" {
+  cidr_block = "10.0.0.0/16"
+  tags = {
+    Name = "Dev"
+  }
   
 }
-resource "aws_subnet" "name" {
-    vpc_id = aws_vpc.name.id
-    cidr_block = "10.0.1.0/24"
-    tags = {
-      Name = "Subnet1"
-    }
+
+resource "aws_subnet" "sub-1" {
+  vpc_id = aws_vpc.Dev.id
+  cidr_block = "10.0.1.0/24"
+  tags = {
+    Name = "Subnet-1"
+  }
   
 }
-resource "aws_instance" "temp" {
-    ami = "ami-07860a2d7eb515d9a"
-    subnet_id = aws_subnet.name.id
-    instance_type = "t3.micro"
+
+resource "aws_instance" "ec2" {
+  ami =var.ami_id
+  instance_type = var.instance_type
+  subnet_id = aws_subnet.sub-1.id
+  key_name = "test"
+  tags = {
+    Name = "ec2"
+  }
   
 }
