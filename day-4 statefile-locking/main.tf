@@ -20,7 +20,7 @@ resource "aws_instance" "name" {
     ami = var.ami-id
     instance_type = var.ec2-type
     tags = {
-      Name = "ec2"
+      Name = "dev-2"
     }
   
 }
