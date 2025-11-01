@@ -8,3 +8,5 @@ resource "aws_instance" "name" {
     }
 
 }
+
+# command is a $terraform import aws_instance.name i-0d57c2efba9128f62
