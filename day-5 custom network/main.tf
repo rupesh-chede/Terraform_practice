@@ -1,107 +1,126 @@
-# Create VPC
-resource "aws_vpc" "name" {
-    cidr_block = "10.0.0.0/16"
-    tags = {
-      Name = "dev"
-    }
-  
+resource "aws_vpc" "Dev-VPC" {
+  cidr_block = "10.0.0.0/16"
+  tags = {
+    Name = "Dev-VPC"
+  } 
 }
 
-#Create subnet 1
-resource "aws_subnet" "name" {
-    vpc_id = aws_vpc.name.id
-    cidr_block = "10.0.0.0/24"
-    availability_zone = "us-east-1a"
-    tags = {
-      Name = "sub-1"
-    }
+resource "aws_subnet" "public" {
+  vpc_id = aws_vpc.Dev-VPC.id
+  cidr_block = "10.0.0.0/24"
+  availability_zone = "us-east-1a"
+  tags = {
+    Name = "Public-sub"
+  }
 }
 
-#Create subnet 2
-resource "aws_subnet" "name1" {
-    vpc_id = aws_vpc.name.id
-    cidr_block = "10.0.1.0/24"
-    availability_zone = "us-east-1b"
-    tags = {
-      Name = "sub-2"
-    }
+resource "aws_subnet" "private" {
+  vpc_id = aws_vpc.Dev-VPC.id
+  cidr_block = "10.0.1.0/24"
+  availability_zone = "us-east-1b"
+  tags = {
+    Name = "Private-sub"
+  }
 }
 
-#Create internet gateway
-resource "aws_internet_gateway" "name" {
-    vpc_id = aws_vpc.name.id
+resource "aws_internet_gateway" "ig" {
+  vpc_id = aws_vpc.Dev-VPC.id
+  tags = {
+    Name = "Dev-ig"
+  }
 }
 
-
-#Create route table and edit route
-resource "aws_route_table" "name" {
-    vpc_id = aws_vpc.name.id
+resource "aws_route_table" "route-table-1" {
+    vpc_id = aws_vpc.Dev-VPC.id
 
    route {
-
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.name.id
+    gateway_id = aws_internet_gateway.ig.id
+   }
 
+   tags = {
+     Name = "IG"
    }
 }
 
-#Create subnet association 
 resource "aws_route_table_association" "name" {
-    subnet_id = aws_subnet.name.id
-    route_table_id = aws_route_table.name.id
+  subnet_id = aws_subnet.public.id
+  route_table_id = aws_route_table.route-table-1.id
 }
 
-#Create SG
-resource "aws_security_group" "name" {
-    name = "allow"
-    vpc_id = aws_vpc.name.id
-    tags = {
-      Name = "dev"
-    }
-      ingress {
+resource "aws_security_group" "sg" {
+  name = "allow"
+  vpc_id = aws_vpc.Dev-VPC.id
+  tags = {
+    Name = "SG"
+  }
+
+  ingress {
     description = "HTTP"
     from_port   = 80
     to_port     = 80
     protocol    = "TCP"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
-    ingress  {
-        description = "SSH"
-        from_port = 22
-        to_port = 22
-        protocol = "TCP"
-        cidr_blocks = ["0.0.0.0/0"]
-    }
+  ingress {
+    description = "SSH"
+    from_port = 22
+    to_port = 22
+    protocol = "TCP"
+    cidr_blocks = [ "0.0.0.0/0" ]
+  }
 }
 
-#Servers
-resource "aws_instance" "name" {
-    ami = var.ami-id
-    instance_type = var.ec2-type
-    subnet_id = aws_subnet.name.id
-    vpc_security_group_ids = [ aws_security_group.name.id ]
-    associate_public_ip_address = true
-    tags = {
-      Name = "public-ec2"
-    }
-  
-}
-
-resource "aws_instance" "name2" {
+resource "aws_instance" "public-ec2" {
+  subnet_id = aws_subnet.public.id
   ami = var.ami-id
   instance_type = var.ec2-type
-  subnet_id = aws_subnet.name1.id
-  vpc_security_group_ids = [ aws_security_group.name.id ]
-
-  
+  vpc_security_group_ids = [ aws_security_group.sg.id ]
+  associate_public_ip_address = true
+  tags = {
+    Name = "Public-Server"
+  }
 }
 
+resource "aws_instance" "private-ec2" {
+  subnet_id = aws_subnet.private.id
+  ami = var.ami-id
+  instance_type = var.ec2-type
+  vpc_security_group_ids = [ aws_security_group.sg.id ]
+  tags = {
+    Name = "Private-server"
+  }
+}
 
-#create EIP 
+resource "aws_eip" "my_elastic_ip" {
+  tags = {
+    Name = "MyEIP"
+  }
+}
 
-#create nat
+resource "aws_nat_gateway" "nat" {
+  subnet_id = aws_subnet.public.id
+  allocation_id = aws_eip.my_elastic_ip.id
+  tags = {
+    Name = "Nat-Gatway"
+  }
+}
 
-#create RT and edit routes
+resource "aws_route_table" "pvt-rt" {
+  vpc_id = aws_vpc.Dev-VPC.id
 
-#Route table asscoiation 
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.ig.id
+  }
+
+  tags = {
+    Name = "private-rt"
+  }
+}
+
+resource "aws_route_table_association" "name1" {
+  subnet_id = aws_subnet.private.id
+  route_table_id = aws_route_table.pvt-rt.id
+  
+}

@@ -1,4 +1,4 @@
-output "vpc-id" {
+/*output "vpc-id" {
     value = aws_vpc.name.id
 }
 
@@ -21,3 +21,4 @@ output "private-ec2-public-ip" {
 output "private-ec2-private-ip" {
     value = aws_instance.name2.private_ip
 }
+*/
