@@ -13,6 +13,8 @@ resource "aws_db_instance" "name" {
     maintenance_window = "sun:04:00-sun:05:00"
     skip_final_snapshot = true
     db_subnet_group_name = aws_db_subnet_group.name.id
+
+    depends_on = [ aws_db_subnet_group.name.id ]
   
 }
 
@@ -46,5 +48,6 @@ resource "aws_db_subnet_group" "name" {
     tags = {
       Name = "Subnet-group"
     }
+    
   
 }
