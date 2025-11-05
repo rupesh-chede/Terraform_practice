@@ -1,4 +1,3 @@
-
 resource "aws_iam_role" "lambda_role" {
   name = "lambda_execution_role"
 
@@ -19,9 +18,6 @@ resource "aws_iam_role_policy_attachment" "lambda_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-
-
-
 resource "aws_lambda_function" "my_lambda" {
   function_name = "my_lambda_function"
   role          =  aws_iam_role.lambda_role.arn
@@ -29,4 +25,8 @@ resource "aws_lambda_function" "my_lambda" {
   runtime       = "python3.12"
   timeout       = 900
   memory_size   = 128
+
+  filename         = "lambda_function.zip"  # Ensure this file exists
+  source_code_hash = filebase64sha256("lambda_function.zip")
+  
 }
