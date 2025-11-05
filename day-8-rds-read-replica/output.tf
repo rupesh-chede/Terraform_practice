@@ -17,3 +17,8 @@ output "subgroup" {
 output "db_id" {
     value = aws_db_instance.mydb.id
 }
+
+output "replica" {
+    value = aws_db_instance.mydb_replica.id
+  
+}

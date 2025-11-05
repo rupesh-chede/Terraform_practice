@@ -63,5 +63,14 @@ resource "aws_db_instance" "mydb" {
     skip_final_snapshot = true
 }
 
+# Read Replica
+resource "aws_db_instance" "mydb_replica" {
+  identifier          = "myterraformdb-replica"
+  replicate_source_db = aws_db_instance.mydb.identifier
+
+  instance_class      = "db.t3.micro"
+  publicly_accessible = true
+
+}
 
 
