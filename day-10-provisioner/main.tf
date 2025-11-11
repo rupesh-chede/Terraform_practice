@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 # Key Pair
 resource "aws_key_pair" "example" {
   key_name   = "task"
