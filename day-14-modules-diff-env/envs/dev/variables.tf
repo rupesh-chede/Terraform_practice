@@ -1,10 +1,10 @@
 variable "ami_id" {
-    default = "ami-0c55b159cbfafe1f0"
+    default = "ami-0cae6d6fe6048ca2c"
     type = string
 }
 
 variable "instance_type" {
-    default = "t3.mirco"
+    default = "t3.micro"
     type = string
 }
 
