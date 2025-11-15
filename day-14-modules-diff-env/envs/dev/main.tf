@@ -19,3 +19,15 @@ module "server" {
     server_name = var.server_name
   
 }
+
+module "rds" {
+    source = "../../modules/rds"
+    sub_1_id = module.network.subnet_1_id
+    sub_2_id = module.network.subnet_2_id
+    instance_class = "db.t3.mirco"
+    db_name = "Dev-RDS"
+    db_user = "admin"
+    db_pass = "SkyOps123"
+
+  
+}

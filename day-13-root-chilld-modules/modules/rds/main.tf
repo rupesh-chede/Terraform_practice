@@ -5,7 +5,7 @@ resource "aws_db_subnet_group" "db_subnet_group" {
     tags = {
       Name = "My Subnet Group"
     }
-  
+ 
 }
 
 resource "aws_db_instance" "my_sql" {
